@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class Main {
 
-    private final int TAMANO = 3;
+    private final int TAMANO = 8;
     private int[] board = new int[TAMANO];
     private int availableCombintations = 0;
 
@@ -16,8 +16,8 @@ public class Main {
 
         mostrarValores();
         System.out.println("---");
-        //check();
-        funcRec(0);
+        check();
+        //funcRec(0);
     }
 
     private void initialize() {
@@ -27,18 +27,18 @@ public class Main {
     }
 
     private int funcRec(int pos) {
-        if (!areBoardLastPosition(board, lastPosition())) {
-                if (board[(TAMANO - 1) - pos] != TAMANO) {
-                    board[(TAMANO - 1) - pos] = ++board[(TAMANO - 1) - pos];
-                    if (pos != 0) {
-                        pos = 0;
-                    }
-                    mostrarValores();
-                } else {
-                    board[(TAMANO - 1) - pos] = 1;
-                    pos++;
+        if (!areBoardLastPosition(lastPosition())) {
+            if (board[(TAMANO - 1) - pos] != TAMANO) {
+                board[(TAMANO - 1) - pos] = ++board[(TAMANO - 1) - pos];
+                if (pos != 0) {
+                    pos = 0;
                 }
-                funcRec(pos);
+                mostrarValores();
+            } else {
+                board[(TAMANO - 1) - pos] = 1;
+                pos++;
+            }
+            funcRec(pos);
         }
 
         return -1;
@@ -49,15 +49,33 @@ public class Main {
         int[] lastPosition = lastPosition();
 
         do {
-            checkSingleIteration(board);
+            //checkSingleIteration(board);
+            checkInterationMine();
 
             mostrarValores();
-        } while (!areBoardLastPosition(board, lastPosition)) ;
+        } while (areBoardLastPosition(lastPosition));
+    }
+
+    private void checkInterationMine() {
+
+        for (int i = TAMANO - 1; i >= 0; i--) {
+
+            int currentValue = board[i];
+
+            if (currentValue < TAMANO) {
+                board[i] = (currentValue + 1);
+                break;
+            } else {
+                board[i] = 1;
+            }
+
+        }
+
     }
 
     private void checkSingleIteration(int[] board) {
 
-        for (int i = TAMANO-1; i > 0; i--) {
+        for (int i = TAMANO - 1; i > 0; i--) {
 
             if (board[i] < TAMANO) {
 
@@ -67,7 +85,7 @@ public class Main {
                 board[i] = 1;
 
                 try {
-                    board[i-1]++;
+                    board[i - 1]++;
                 } catch (Exception ex) {
                     // board[i] = 0;
                     System.err.println(ex.getMessage());
@@ -92,7 +110,7 @@ public class Main {
         return maxPosition;
     }
 
-    private boolean areBoardLastPosition(int[] board, int[] lastPosition) {
-        return Arrays.equals(lastPosition, board);
+    private boolean areBoardLastPosition(int[] lastPosition) {
+        return !Arrays.equals(board, lastPosition);
     }
 }
