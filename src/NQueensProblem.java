@@ -2,8 +2,9 @@ import java.util.Arrays;
 
 public class NQueensProblem {
 
-    private final int TAMANO = 8;
-    private int[] board = new int[TAMANO];
+    private final int QUEENS = 8;
+    private final int[] board;
+    private final long time_start = System.currentTimeMillis();
     private int solutions;
 
     public static void main(String[] args) {
@@ -11,12 +12,13 @@ public class NQueensProblem {
     }
 
     private NQueensProblem() {
+        board = new int[QUEENS];
         initialize();
         check();
     }
 
     private void initialize() {
-        for (int i = 0; i < TAMANO; i++) {
+        for (int i = 0; i < QUEENS; i++) {
             board[i] = (i + 1);
         }
     }
@@ -30,12 +32,15 @@ public class NQueensProblem {
         } while (areBoardLastPosition(lastPosition));
 
         System.out.println("There are " + solutions + " differents solutions.");
+
+        final long time_end = System.currentTimeMillis();
+        System.out.println("The task has taken " + (time_end - time_start) + " milliseconds.");
     }
 
     private int[] lastPosition() {
-        int[] maxPosition = new int[TAMANO];
-        for (int i = 0; i < TAMANO; i++) {
-            maxPosition[i] = (TAMANO - i);
+        int[] maxPosition = new int[QUEENS];
+        for (int i = 0; i < QUEENS; i++) {
+            maxPosition[i] = (QUEENS - i);
         }
 
         return maxPosition;
@@ -47,11 +52,11 @@ public class NQueensProblem {
 
     private void generateNewPosition() {
 
-        for (int i = TAMANO - 1; i >= 0; i--) {
+        for (int i = QUEENS - 1; i >= 0; i--) {
 
             int currentValue = board[i];
 
-            if (currentValue < TAMANO) {
+            if (currentValue < QUEENS) {
                 board[i] = (currentValue + 1);
                 break;
             } else {
@@ -60,12 +65,12 @@ public class NQueensProblem {
 
         }
 
-        if (everyNumberIsDif()) {
+        if (everyNumberIsDiff() && followingNumberIsNext()) {
             checkValues();
         }
     }
 
-    private boolean everyNumberIsDif() {
+    private boolean everyNumberIsDiff() {
         int[] aux = Arrays.copyOf(board, board.length);
 
         Arrays.sort(aux);
@@ -78,53 +83,89 @@ public class NQueensProblem {
         return true;
     }
 
-
-    private void checkValues() {
-
-        int[] aux1 = Arrays.copyOf(board, board.length);
-
-        for (int i = 0; i < TAMANO; i++) {
-            aux1[i] = board[i] + i;
-        }
-
-        Arrays.sort(aux1);
-        boolean estaY = false;
-        for (int i = 1; i < aux1.length; i++) {
-            if (aux1[i] == aux1[i - 1]) {
-                estaY = true;
-                break;
+    /**
+     * This method check that there are not two consecutives numbers placed in the array, if they are,
+     * that means that they can catch themselves, so that it is not a valid solution.
+     * <p>
+     * e.g. [ 3, 2, 4, 1]
+     * <p>
+     * _1_2_3_4_
+     * | | | |o|
+     * | |x| | |
+     * |x| | | |
+     * | | |o| |
+     * <p>
+     * 'X' values are in the same diagonal.
+     *
+     * @return boolean
+     */
+    private boolean followingNumberIsNext() {
+        for (int i = 0; i < QUEENS - 1; i++) {
+            if ((board[i] == board[i + 1] + 1) || board[i] == board[i + 1] - 1) {
+                return false;
             }
         }
 
-        int[] aux2 = Arrays.copyOf(board, board.length);
-
-        for (int i = 0; i < TAMANO; i++) {
-            aux2[i] = board[i] - i;
-        }
-
-        Arrays.sort(aux2);
-        boolean estaX = false;
-        for (int i = 1; i < aux2.length; i++) {
-            if (aux2[i] == aux2[i - 1]) {
-                estaX = true;
-                break;
-            }
-        }
-
-        if (!estaX && !estaY) {
-            solutions++;
-            mostrarValores();
-        }
-
+        return true;
     }
 
-    private void mostrarValores() {
-        String res = "[ ";
-        for (int i = 0; i < TAMANO; i++) {
-            res += (board[i] + ", ");
+    /**
+     * Check if there is any other value in the same diagonal. If not, it is a valid solution.
+     */
+    private void checkValues() {
+
+        final boolean A_DIAGONAL, B_DIAGONAL;
+
+        int[] aux1 = diagonalValuesA();
+        int[] aux2 = diagonalValuesB();
+
+        A_DIAGONAL = sameDiagonal(aux1);
+        B_DIAGONAL = sameDiagonal(aux2);
+
+        if (!A_DIAGONAL && !B_DIAGONAL) {
+            solutions++;
+            showQueens();
+        }
+    }
+
+    private int[] diagonalValuesA() {
+        int[] aux = Arrays.copyOf(board, board.length);
+        for (int i = 0; i < QUEENS; i++) {
+            aux[i] = board[i] + i;
+        }
+        Arrays.sort(aux);
+
+        return aux;
+    }
+
+    private int[] diagonalValuesB() {
+        int[] aux = Arrays.copyOf(board, board.length);
+        for (int i = 0; i < QUEENS; i++) {
+            aux[i] = board[i] - i;
+        }
+        Arrays.sort(aux);
+
+        return aux;
+    }
+
+    private boolean sameDiagonal(int[] auxBoard) {
+        for (int i = 1; i < auxBoard.length; i++) {
+            if (auxBoard[i] == auxBoard[i - 1]) {
+                return true;
+            }
         }
 
-        res = res.substring(0, res.length()-2) + " ]";
+        return false;
+    }
+
+    private void showQueens() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[ ");
+        for (Integer value : board) {
+            builder.append(value).append(", ");
+        }
+
+        String res = builder.substring(0, builder.length() - 2) + " ]";
         System.out.println(res);
     }
 
