@@ -2,9 +2,9 @@ import java.util.Arrays;
 
 public class NQueensProblem {
 
-    private final int QUEENS = 8;
+    private final int QUEENS = 10;
     private final int[] board;
-    private final long time_start = System.currentTimeMillis();
+    private final long time_start;
     private int solutions;
 
     public static void main(String[] args) {
@@ -12,9 +12,12 @@ public class NQueensProblem {
     }
 
     private NQueensProblem() {
+        time_start = System.currentTimeMillis();
         board = new int[QUEENS];
+
         initialize();
         check();
+        solutionsAndTime();
     }
 
     private void initialize() {
@@ -29,12 +32,7 @@ public class NQueensProblem {
 
         do {
             generateNewPosition();
-        } while (areBoardLastPosition(lastPosition));
-
-        System.out.println("There are " + solutions + " differents solutions.");
-
-        final long time_end = System.currentTimeMillis();
-        System.out.println("The task has taken " + (time_end - time_start) + " milliseconds.");
+        } while (isBoardLastPosition(lastPosition));
     }
 
     private int[] lastPosition() {
@@ -46,41 +44,47 @@ public class NQueensProblem {
         return maxPosition;
     }
 
-    private boolean areBoardLastPosition(int[] lastPosition) {
+    private boolean isBoardLastPosition(int[] lastPosition) {
         return !Arrays.equals(board, lastPosition);
     }
 
     private void generateNewPosition() {
 
-        for (int i = QUEENS - 1; i >= 0; i--) {
+        nextPermutation(board);
 
-            int currentValue = board[i];
-
-            if (currentValue < QUEENS) {
-                board[i] = (currentValue + 1);
-                break;
-            } else {
-                board[i] = 1;
-            }
-
-        }
-
-        if (everyNumberIsDiff() && followingNumberIsNext()) {
+        if (followingNumberIsNext()) {
             checkValues();
         }
     }
 
-    private boolean everyNumberIsDiff() {
-        int[] aux = Arrays.copyOf(board, board.length);
+    private void nextPermutation(int[] array) {
 
-        Arrays.sort(aux);
-        for (int i = 1; i < aux.length; i++) {
-            if (aux[i] == aux[i - 1]) {
-                return false;
-            }
+        int i = array.length - 1;
+        while (i > 0 && array[i - 1] >= array[i]) {
+            i--;
         }
 
-        return true;
+        if (i <= 0) {
+            return;
+        }
+
+        int j = array.length - 1;
+        while (array[j] <= array[i - 1]) {
+            j--;
+        }
+
+        int temp = array[i - 1];
+        array[i - 1] = array[j];
+        array[j] = temp;
+
+        j = array.length - 1;
+        while (i < j) {
+            temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+            i++;
+            j--;
+        }
     }
 
     /**
@@ -89,11 +93,11 @@ public class NQueensProblem {
      * <p>
      * e.g. [ 3, 2, 4, 1]
      * <p>
-     * _1_2_3_4_
-     * | | | |o|
-     * | |x| | |
-     * |x| | | |
-     * | | |o| |
+     *   _1_2_3_4_
+     * 1 | | | |o|
+     * 2 | |x| | |
+     * 3 |x| | | |
+     * 4 | | |o| |
      * <p>
      * 'X' values are in the same diagonal.
      *
@@ -128,6 +132,25 @@ public class NQueensProblem {
         }
     }
 
+    /**
+     * Check if they are repeated numbers in the array.
+     * It is calculated adding the value plus the position it is occupying.
+     * <p>
+     * e.g. [ 3, 2, 4, 1]
+     * <p>
+     *   _1_2_3_4_
+     * 1 | | | |o|
+     * 2 | |x| | |
+     * 3 |x| | | |
+     * 4 | | |o| |
+     * <p>
+     * 3 + 1 = 4
+     * 2 + 2 = 4
+     * 4 + 3 = 7
+     * 1 + 4 = 5
+     *
+     * @return the generated array
+     */
     private int[] diagonalValuesA() {
         int[] aux = Arrays.copyOf(board, board.length);
         for (int i = 0; i < QUEENS; i++) {
@@ -138,6 +161,25 @@ public class NQueensProblem {
         return aux;
     }
 
+    /**
+     * Check if they are repeated numbers in the array.
+     * It is calculated adding the value minus the position it is occupying.
+     * <p>
+     * e.g. [ 2, 3, 4, 1]
+     * <p>
+     *   _1_2_3_4_
+     * 1 | | | |o|
+     * 2 |x| | | |
+     * 3 | |x| | |
+     * 4 | | |x| |
+     * <p>
+     * 2 - 1 = 1
+     * 3 - 2 = 1
+     * 4 - 3 = 1
+     * 1 - 4 = -3
+     *
+     * @return the generated array
+     */
     private int[] diagonalValuesB() {
         int[] aux = Arrays.copyOf(board, board.length);
         for (int i = 0; i < QUEENS; i++) {
@@ -159,14 +201,13 @@ public class NQueensProblem {
     }
 
     private void showQueens() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[ ");
-        for (Integer value : board) {
-            builder.append(value).append(", ");
-        }
-
-        String res = builder.substring(0, builder.length() - 2) + " ]";
-        System.out.println(res);
+        System.out.println(Arrays.toString(board));
     }
 
+    private void solutionsAndTime() {
+        System.out.println("\nThere are " + solutions + " differents solutions.");
+
+        final long time_end = System.currentTimeMillis();
+        System.out.println("The task has taken " + (time_end - time_start) + " milliseconds.");
+    }
 }
