@@ -2,31 +2,36 @@ import java.util.Arrays;
 
 public class NQueensProblem {
 
-    private final int QUEENS = 10;
-    private final int[] board;
-    private final long time_start;
+    private int QUEENS;
+    private int[] board;
+    private long time_start;
     private int solutions;
 
     public static void main(String[] args) {
-        new NQueensProblem();
+        int QUEENS_BY_DEFAULT = 8;
+        int numberOfQueens = (args.length == 0) ? QUEENS_BY_DEFAULT : Integer.parseInt(args[0]);
+
+        new NQueensProblem(numberOfQueens);
     }
 
-    private NQueensProblem() {
+    private NQueensProblem(int nQueens) {
+
+        initialize(nQueens);
+        loopThrowTheBoard();
+        printSolutionsAndTime();
+    }
+
+    private void initialize(int nQueens) {
         time_start = System.currentTimeMillis();
+        QUEENS = nQueens;
         board = new int[QUEENS];
 
-        initialize();
-        check();
-        solutionsAndTime();
-    }
-
-    private void initialize() {
         for (int i = 0; i < QUEENS; i++) {
             board[i] = (i + 1);
         }
     }
 
-    private void check() {
+    private void loopThrowTheBoard() {
 
         int[] lastPosition = lastPosition();
 
@@ -52,7 +57,7 @@ public class NQueensProblem {
 
         nextPermutation(board);
 
-        if (followingNumberIsNext()) {
+        if (isFollowingNumberTheNextOne()) {
             checkValues();
         }
     }
@@ -103,7 +108,7 @@ public class NQueensProblem {
      *
      * @return boolean
      */
-    private boolean followingNumberIsNext() {
+    private boolean isFollowingNumberTheNextOne() {
         for (int i = 0; i < QUEENS - 1; i++) {
             if ((board[i] == board[i + 1] + 1) || board[i] == board[i + 1] - 1) {
                 return false;
@@ -200,11 +205,12 @@ public class NQueensProblem {
         return false;
     }
 
+
     private void showQueens() {
         System.out.println(Arrays.toString(board));
     }
 
-    private void solutionsAndTime() {
+    private void printSolutionsAndTime() {
         System.out.println("\nThere are " + solutions + " differents solutions.");
 
         final long time_end = System.currentTimeMillis();
