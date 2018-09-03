@@ -4,25 +4,19 @@ public class NQueensProblem {
 
     private int QUEENS;
     private int[] board;
-    private long time_start;
     private int solutions;
 
-    public static void main(String[] args) {
-        int QUEENS_BY_DEFAULT = 8;
-        int numberOfQueens = (args.length == 0) ? QUEENS_BY_DEFAULT : Integer.parseInt(args[0]);
-
-        new NQueensProblem(numberOfQueens);
+    public int getSolutions() {
+        return solutions;
     }
 
-    private NQueensProblem(int nQueens) {
+    public NQueensProblem(int nQueens) {
 
         initialize(nQueens);
         loopThrowTheBoard();
-        printSolutionsAndTime();
     }
 
     private void initialize(int nQueens) {
-        time_start = System.currentTimeMillis();
         QUEENS = nQueens;
         board = new int[QUEENS];
 
@@ -205,15 +199,7 @@ public class NQueensProblem {
         return false;
     }
 
-
     private void showQueens() {
         System.out.println(Arrays.toString(board));
-    }
-
-    private void printSolutionsAndTime() {
-        System.out.println("\nThere are " + solutions + " differents solutions.");
-
-        final long time_end = System.currentTimeMillis();
-        System.out.println("The task has taken " + (time_end - time_start) + " milliseconds.");
     }
 }
