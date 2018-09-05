@@ -5,9 +5,10 @@ public class NQueensProblem {
     private int QUEENS;
     private int[] board;
     private int solutions;
+    private long time_start;
 
-    public int getSolutions() {
-        return solutions;
+    public NQueensProblemSolution getSolution() {
+        return new NQueensProblemSolution(solutions, time_start);
     }
 
     public NQueensProblem(int nQueens) {
@@ -17,8 +18,9 @@ public class NQueensProblem {
     }
 
     private void initialize(int nQueens) {
-        QUEENS = nQueens;
-        board = new int[QUEENS];
+        this.time_start = System.currentTimeMillis();
+        this.QUEENS = nQueens;
+        this.board = new int[QUEENS];
 
         for (int i = 0; i < QUEENS; i++) {
             board[i] = (i + 1);
